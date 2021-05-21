@@ -1,0 +1,8 @@
+<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="5.333285" width="5.333285" y="-1" x="-1"/>
+  <text font-style="normal" font-weight="bold" fill="#fff" x="-17.57021" y="-12.94286" id="svg_1" font-size="24" font-family="'Courier New', Courier, monospace" text-anchor="start" xml:space="preserve" transform="matrix(0.5429902638211646,0,0,0.5791402159324899,9.548372494699992,19.104681232697427) " stroke="#fff">QR</text>
+ </g>
+
+</svg>
