@@ -94,15 +94,15 @@ export default {
       const res = await this.$http.post('/api/user/updateProduct', {
         pid: '1000000001',
         pname: '苹果',
-        origin: '山西',
+        origin: '上海',
         storage: '冷冻',
         transport: '水运'
       })
       console.log(res)
 
-      if (res.data.status === 200) {
+      if (res.status === 200) {
         window.sessionStorage.setItem('token', new Date().getTime())
-        // this.$router.push('/goods')
+        this.$router.push('/goods')
       }
     },
     // 监听登录对话框关闭的事件
