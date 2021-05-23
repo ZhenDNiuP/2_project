@@ -1,7 +1,11 @@
 <template>
   <div class="info">
     <div>
-      <div class="label"><label>用户类型</label></div>
+      <div class="label"><label>用户ID</label></div>
+      <div class="input"><a-input /></div>
+    </div>
+    <div>
+      <div class="label"><label>用户姓名</label></div>
       <div class="input"><a-input /></div>
     </div>
     <div>
@@ -9,12 +13,8 @@
       <div class="input"><a-input /></div>
     </div>
     <div>
-      <div class="label"><label>公司名称</label></div>
-      <div class="input"><a-input /></div>
-    </div>
-    <div>
       <div class="label">
-        <label>社会统一<br />信用代码</label>
+        <label>身份证号</label>
       </div>
       <div class="input"><a-input /></div>
     </div>
