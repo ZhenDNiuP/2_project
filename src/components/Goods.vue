@@ -1,18 +1,37 @@
 <template>
   <div class="goodsContainer">
-    <a-button @click="showAddModal">添加商品</a-button>
+    <a-row>
+      <a-col class="col" :span="6" :offset="1">
+        <a-button @click="showAddModal">添加商品</a-button>
+      </a-col>
+    </a-row>
+    <a-row :gutter="[16, 16]">
+      <a-col :span="6" :offset="1">
+        <a-input-search
+          style="width: 300px"
+          enter-button
+          allow-clear
+          :loading="loadingVisible"
+          @search="onSearch"
+        ></a-input-search>
+      </a-col>
+    </a-row>
+    <a-row>
+      <a-col :offset="1">
+        <a-table bordered :data-source="goodsList" :pagination="pagination" class="table" align="center">
+          <a-table-column key="p_name" title="商品名称" data-index="p_name" />
+          <a-table-column key="origin" title="发源地" data-index="origin" />
+          <a-table-column key="infotime" title="日期" data-index="infotime"></a-table-column>
+          <a-table-column>
+            <template slot-scope="row">
+              <a-button @click="toView(row)">查看</a-button>
+              <a-button style="margin: 0 20px" @click="showEditModal(row)">修改</a-button>
+            </template>
+          </a-table-column>
+        </a-table>
+      </a-col>
+    </a-row>
 
-    <a-table bordered :data-source="goodsList" :pagination="pagination" class="table" align="center">
-      <a-table-column key="p_name" title="商品名称" data-index="p_name" />
-      <a-table-column width="300px" key="origin" title="发源地" data-index="origin" />
-      <a-table-column key="infotime" title="日期" data-index="infotime"></a-table-column>
-      <a-table-column>
-        <template slot-scope="row">
-          <a-button @click="toView(row)">查看</a-button>
-          <a-button style="margin: 0 20px" @click="showEditModal(row)">修改</a-button>
-        </template>
-      </a-table-column>
-    </a-table>
     <!-- 查看商品信息的对话框 -->
     <a-modal
       v-model="viewModalVisible"
@@ -100,8 +119,9 @@ export default {
       userId: '',
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
-      goodsList: [],
-      productInfo: {},
+      goodsList: [], // 表格数据
+      sourceData: [], // 数据源
+      productInfo: {}, // 商品信息
       addProductForm: {
         p_name: '',
         origin: '',
@@ -111,6 +131,7 @@ export default {
       addModalVisible: false,
       editModalVisible: false,
       viewModalVisible: false,
+      loadingVisible: false,
       addRules: {
         p_name: [{ trigger: 'blur', required: true, message: '请输入商品名称' }],
         origin: [{ trigger: 'blur', required: true, message: '请输入发源地' }],
@@ -122,6 +143,7 @@ export default {
   created() {
     this.getProduct()
   },
+  mounted() {},
   methods: {
     async getProduct() {
       this.userId = window.sessionStorage.getItem('userId')
@@ -134,9 +156,12 @@ export default {
           item.key = index
           item.infotime = format(item.infotime)
         })
-        this.goodsList = res.data
+        this.sourceData = res.data
       }
-      console.log(this.goodsList)
+
+      this.goodsList = this.sourceData
+
+      console.log(this.sourceData)
     },
     // 展示查看信息的对话框
     async toView(row) {
@@ -177,6 +202,7 @@ export default {
       this.getProduct()
       this.$refs.addProductRef.resetFields()
       this.addModalVisible = false
+      this.$message.success('添加成功！')
     },
     async editOk() {
       const res = await this.$http.post('/api/user/updateProduct', {
@@ -189,16 +215,28 @@ export default {
       if (res.data) {
         this.getProduct()
         this.editModalVisible = false
+        this.$message.success('修改成功！')
       }
     },
-    // editCancel() {
-    //   this.$refs.editProductRef.resetFields()
-    // },
-    // viewCancel() {
-    //   this.$refs.viewProductRef.resetFields()
-    // },
     addCancel() {
       this.$refs.addProductRef.resetFields()
+    },
+    async onSearch(val) {
+      let timer
+      clearTimeout(timer)
+      const res = await this.$http.post('/api/user/selectProductP', {
+        pid: val
+      })
+      this.loadingVisible = true
+      timer = setTimeout(() => {
+        if (res.data.length === 0) {
+          this.goodsList = this.sourceData
+          this.$message.warning('未查询到该商品！')
+        } else {
+          this.goodsList = res.data
+        }
+        this.loadingVisible = false
+      }, 500)
     }
   },
   computed: {
@@ -213,15 +251,15 @@ export default {
 }
 </script>
 <style>
-.goodsContainer > .ant-btn {
+.col > .ant-btn {
   width: 92px;
   height: 38px;
   background-color: #009688;
   color: #fff;
-  margin: 10px;
+  margin-top: 20px;
 }
-.goodsContainer > .ant-btn:hover,
-.goodsContainer > .ant-btn:focus {
+.col > .ant-btn:hover,
+.col > .ant-btn:focus {
   color: #fff;
   background-color: #009688;
 }
