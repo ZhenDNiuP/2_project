@@ -163,16 +163,6 @@ export default {
       const res = await this.$http.post('/api/user/selectUser', this.loginForm)
       console.log(res)
 
-      // const res = await this.$http.post('/api/user/selectProductU', {
-      //   upid: '0000000001'
-      // })
-      // console.log(res)
-
-      // const res = await this.$http.post('/api/user/selectProductP', {
-      //   pid: '1000000001'
-      // })
-      // console.log(res)
-
       // const res = await this.$http.post('/api/user/addProduct', {
       //   pname: '椰子',
       //   origin: '海南',
@@ -182,21 +172,15 @@ export default {
       // })
       // console.log(res)
 
-      // const res = await this.$http.post('/api/user/updateProduct', {
-      //   pid: '1000000001',
-      //   pname: '苹果',
-      //   origin: '上海',
-      //   storage: '冷冻',
-      //   transport: '水运'
-      // })
-      // console.log(res)
-
-      if (res.status === 200) {
+      if (res.data.length === 0) {
+        this.$message.warning('请输入正确的手机号或密码！')
+      } else {
         window.sessionStorage.setItem('token', new Date().getTime())
+        window.sessionStorage.setItem('userId', res.data[0].u_id)
         this.$router.push('/goods')
         this.$message.success('登录成功！')
+        this.loginVisible = false
       }
-      this.loginVisible = false
     },
     // 点击注册添加用户
     registeredOk() {

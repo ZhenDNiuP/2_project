@@ -2,7 +2,7 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: 8080,
-    open: true,
+    open: false,
     overlay: {
       warnings: false,
       errors: true
@@ -15,6 +15,6 @@ module.exports = {
           '^/api': '/api'
         }
       }
-    },
+    }
   }
 }

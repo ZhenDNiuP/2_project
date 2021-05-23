@@ -4,7 +4,7 @@
       <a-layout-header class="header">农产品溯源数据采集平台</a-layout-header>
       <a-layout>
         <a-layout-sider class="sider">
-          <a-menu theme="dark">
+          <a-menu theme="dark" :default-selected-keys="['goods']">
             <a-menu-item key="goods" ref="goods" @click="() => this.$router.push('/' + this.$refs.goods.eventKey)">
               <span><img src="../assets/goods.svg" /> 商品管理</span>
             </a-menu-item>
