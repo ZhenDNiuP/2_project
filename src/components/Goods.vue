@@ -1,37 +1,21 @@
 <template>
   <div class="goodsContainer">
-    <a-row>
-      <a-col class="col" :span="6" :offset="1">
-        <a-button @click="showAddModal">添加商品</a-button>
-      </a-col>
-    </a-row>
-    <a-row :gutter="[16, 16]">
-      <a-col :span="6" :offset="1">
-        <a-input-search
-          style="width: 300px"
-          enter-button
-          allow-clear
-          :loading="loadingVisible"
-          @search="onSearch"
-        ></a-input-search>
-      </a-col>
-    </a-row>
-    <a-row>
-      <a-col :offset="1">
-        <a-table bordered :data-source="goodsList" :pagination="pagination" class="table" align="center">
-          <a-table-column key="p_name" title="商品名称" data-index="p_name" />
-          <a-table-column key="origin" title="发源地" data-index="origin" />
-          <a-table-column key="infotime" title="日期" data-index="infotime"></a-table-column>
-          <a-table-column>
-            <template slot-scope="row">
-              <a-button @click="toView(row)">查看</a-button>
-              <a-button style="margin: 0 20px" @click="showEditModal(row)">修改</a-button>
-            </template>
-          </a-table-column>
-        </a-table>
-      </a-col>
-    </a-row>
+    <a-button @click="showAddModal">添加商品</a-button>
 
+    <a-table bordered :data-source="goodsList" :pagination="pagination" class="table" align="center">
+      <a-table-column key="p_name" title="商品名称" data-index="p_name" />
+      <a-table-column width="200px" key="origin" title="产地" data-index="origin" />
+      <a-table-column key="infotime" title="填报日期" data-index="infotime" />
+      <a-table-column key="storage" title="存储方式" data-index="storage" />
+      <a-table-column key="transport" title="运输方式" data-index="transport" />
+      <a-table-column>
+        <template slot-scope="row">
+          <a-button @click="toView(row)">查看</a-button>
+          <a-button style="margin: 0 20px" @click="showEditModal(row)">修改</a-button>
+          <a-button @click="toqrCode(row)">生成二维码</a-button>
+        </template>
+      </a-table-column>
+    </a-table>
     <!-- 查看商品信息的对话框 -->
     <a-modal
       v-model="viewModalVisible"
@@ -49,13 +33,13 @@
         <a-form-model-item label="商品名称">
           <a-input disabled :value="productInfo.p_name" />
         </a-form-model-item>
-        <a-form-model-item label="发源地">
+        <a-form-model-item label="产地">
           <a-input disabled :value="productInfo.origin" />
         </a-form-model-item>
-        <a-form-model-item label="日期">
+        <a-form-model-item label="填报时间">
           <a-input disabled :value="productInfo.infotime" />
         </a-form-model-item>
-        <a-form-model-item label="商品状态">
+        <a-form-model-item label="存储方式">
           <a-input disabled :value="productInfo.storage" />
         </a-form-model-item>
         <a-form-model-item label="运输方式">
@@ -75,10 +59,10 @@
         <a-form-model-item label="商品名称" prop="p_name">
           <a-input v-model="addProductForm.p_name" />
         </a-form-model-item>
-        <a-form-model-item label="发源地" prop="origin">
+        <a-form-model-item label="产地" prop="origin">
           <a-input v-model="addProductForm.origin" />
         </a-form-model-item>
-        <a-form-model-item label="商品状态" prop="storage">
+        <a-form-model-item label="存储方式" prop="storage">
           <a-input v-model="addProductForm.storage" />
         </a-form-model-item>
         <a-form-model-item label="运输方式" prop="transport">
@@ -95,13 +79,13 @@
         <a-form-model-item label="商品名称">
           <a-input v-model="productInfo.p_name" />
         </a-form-model-item>
-        <a-form-model-item label="发源地">
+        <a-form-model-item label="产地">
           <a-input v-model="productInfo.origin" />
         </a-form-model-item>
-        <a-form-model-item label="日期">
+        <a-form-model-item label="填报时间">
           <a-input disabled :value="productInfo.infotime" />
         </a-form-model-item>
-        <a-form-model-item label="商品状态">
+        <a-form-model-item label="存储方式">
           <a-input v-model="productInfo.storage" />
         </a-form-model-item>
         <a-form-model-item label="运输方式">
@@ -119,9 +103,8 @@ export default {
       userId: '',
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
-      goodsList: [], // 表格数据
-      sourceData: [], // 数据源
-      productInfo: {}, // 商品信息
+      goodsList: [],
+      productInfo: {},
       addProductForm: {
         p_name: '',
         origin: '',
@@ -131,10 +114,9 @@ export default {
       addModalVisible: false,
       editModalVisible: false,
       viewModalVisible: false,
-      loadingVisible: false,
       addRules: {
         p_name: [{ trigger: 'blur', required: true, message: '请输入商品名称' }],
-        origin: [{ trigger: 'blur', required: true, message: '请输入发源地' }],
+        origin: [{ trigger: 'blur', required: true, message: '请输入产地' }],
         storage: [{ trigger: 'blur', required: true, message: '请输入存储方式' }],
         transport: [{ trigger: 'blur', required: true, message: '请输入运输方式' }]
       }
@@ -143,11 +125,10 @@ export default {
   created() {
     this.getProduct()
   },
-  mounted() {},
   methods: {
     async getProduct() {
       this.userId = window.sessionStorage.getItem('userId')
-      const res = await this.$http.post('/api/user/selectProductU', {
+      const res = await this.$http.post('/api/product/selectProductU', {
         upid: this.userId
       })
       if (res.data.length) {
@@ -156,16 +137,13 @@ export default {
           item.key = index
           item.infotime = format(item.infotime)
         })
-        this.sourceData = res.data
+        this.goodsList = res.data
       }
-
-      this.goodsList = this.sourceData
-
-      console.log(this.sourceData)
+      console.log(this.goodsList)
     },
     // 展示查看信息的对话框
     async toView(row) {
-      const res = await this.$http.post('/api/user/selectProductP', {
+      const res = await this.$http.post('/api/product/selectProductP', {
         pid: row.p_id
       })
       if (res.data) {
@@ -180,7 +158,7 @@ export default {
     },
     // 展示修改商品的对话框
     async showEditModal(row) {
-      const res = await this.$http.post('/api/user/selectProductP', {
+      const res = await this.$http.post('/api/product/selectProductP', {
         pid: row.p_id
       })
       if (res.data) {
@@ -197,15 +175,14 @@ export default {
         storage: this.addProductForm.storage,
         transport: this.addProductForm.transport
       }
-      const res = await this.$http.post('/api/user/addProduct', params)
+      const res = await this.$http.post('/api/product/addProduct', params)
       console.log(res)
       this.getProduct()
       this.$refs.addProductRef.resetFields()
       this.addModalVisible = false
-      this.$message.success('添加成功！')
     },
     async editOk() {
-      const res = await this.$http.post('/api/user/updateProduct', {
+      const res = await this.$http.post('/api/product/updateProduct', {
         pid: this.productInfo.p_id,
         pname: this.productInfo.p_name,
         origin: this.productInfo.origin,
@@ -215,28 +192,23 @@ export default {
       if (res.data) {
         this.getProduct()
         this.editModalVisible = false
-        this.$message.success('修改成功！')
       }
     },
+    // editCancel() {
+    //   this.$refs.editProductRef.resetFields()
+    // },
+    // viewCancel() {
+    //   this.$refs.viewProductRef.resetFields()
+    // },
     addCancel() {
       this.$refs.addProductRef.resetFields()
     },
-    async onSearch(val) {
-      let timer
-      clearTimeout(timer)
-      const res = await this.$http.post('/api/user/selectProductP', {
-        pid: val
-      })
-      this.loadingVisible = true
-      timer = setTimeout(() => {
-        if (res.data.length === 0) {
-          this.goodsList = this.sourceData
-          this.$message.warning('未查询到该商品！')
-        } else {
-          this.goodsList = res.data
-        }
-        this.loadingVisible = false
-      }, 500)
+    // 生成二维码
+    async toqrCode(row) {
+      const res = await this.$http.get('/api/code/qrcode?pid=' + row.p_id)
+      if (res.data) {
+        console.log(res.data)
+      }
     }
   },
   computed: {
@@ -251,19 +223,20 @@ export default {
 }
 </script>
 <style>
-.col > .ant-btn {
+.goodsContainer > .ant-btn {
   width: 92px;
   height: 38px;
   background-color: #009688;
   color: #fff;
-  margin-top: 20px;
+  margin: 10px;
 }
-.col > .ant-btn:hover,
-.col > .ant-btn:focus {
+.goodsContainer > .ant-btn:hover,
+.goodsContainer > .ant-btn:focus {
   color: #fff;
   background-color: #009688;
 }
 .table {
-  width: 900px !important;
+  padding-left: 10px;
+  width: 1100px !important;
 }
 </style>

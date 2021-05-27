@@ -163,15 +163,6 @@ export default {
       const res = await this.$http.post('/api/user/selectUser', this.loginForm)
       console.log(res)
 
-      // const res = await this.$http.post('/api/user/addProduct', {
-      //   pname: '椰子',
-      //   origin: '海南',
-      //   storage: '冷藏',
-      //   transport: '空运',
-      //   upid: '0000000001'
-      // })
-      // console.log(res)
-
       if (res.data.length === 0) {
         this.$message.warning('请输入正确的手机号或密码！')
       } else {

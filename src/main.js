@@ -9,7 +9,6 @@ import axios from 'axios'
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
 axios.defaults.withCredentials = true
-// axios.defaults.baseURL = 'http://localhost:8081'
 new Vue({
   router,
   render: h => h(App)
