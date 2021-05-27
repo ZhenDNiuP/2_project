@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <template>
   <div class="container">
     <a-table bordered :data-source="codeInfo" rowKey="id" :pagination="pagination" class="table" align="center">
