@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-table bordered :data-source="codeInfo" rowKey="id" :pagination="pagination" class="table" align="center">
+    <a-table bordered :data-source="codeInfo" :pagination="pagination" class="table" align="center">
       <a-table-column key="cp_id" title="商品ID" data-index="cp_id" />
       <a-table-column key="cp_name" title="商品名称" data-index="cp_name" />
       <a-table-column key="codetime" title="生成时间" data-index="codetime" />
@@ -12,6 +12,9 @@
     </a-table>
 
     <!-- 查看二维码的对话框 -->
+    <a-modal :footer="null" v-model="qrCodeVisible" title="查看二维码" width="380px">
+      <img :src="codeID" alt="" />
+    </a-modal>
   </div>
 </template>
 
@@ -21,11 +24,21 @@ export default {
   data() {
     return {
       codeInfo: [],
-      codeID: ''
+      codeID: '',
+      qrCodeVisible: false
     }
   },
   created() {
     this.getCode()
+  },
+  computed: {
+    pagination() {
+      return {
+        'show-size-changer': true,
+        total: this.codeInfo.length,
+        showQuickJumper: true
+      }
+    }
   },
   methods: {
     async getCode() {
@@ -44,14 +57,15 @@ export default {
     },
     // 展示二维码的对话框
     async toView(row) {
-      this.codeID = row.cp_id + '.png'
-      this.viewModalVisible = true
+      this.codeID = 'http://localhost:8081/' + row.cp_id + '.png'
+      console.log(this.codeID)
+      this.qrCodeVisible = true
     }
   }
 }
 </script>
 
-<style scoped>
+<style>
 .container {
   margin-top: 20px;
 }
