@@ -3,7 +3,7 @@
     <div class="logos">
       <img class="title" src="../assets/title.png" alt="" />
     </div>
-    <a-input-search class="ipt" enter-button="一键溯源" size="large" />
+    <a-input-search class="ipt" enter-button="一键溯源" size="large" @search="onSearch" />
     <div class="btn">
       <a-button class="btn1" type="primary" @click="login">登录</a-button>
       <a-button @click="registered">注册</a-button>
@@ -67,10 +67,42 @@
         </a-form-model-item>
       </a-form-model>
     </a-modal>
+    <!-- 查看产品信息的对话框 -->
+    <a-modal
+      v-model="viewModalVisible"
+      title="查看商品"
+      @ok="
+        () => {
+          this.viewModalVisible = false
+        }
+      "
+    >
+      <a-form-model :model="productInfo" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="商品id">
+          <a-input disabled :value="productInfo.p_id" />
+        </a-form-model-item>
+        <a-form-model-item label="商品名称">
+          <a-input disabled :value="productInfo.p_name" />
+        </a-form-model-item>
+        <a-form-model-item label="产地">
+          <a-input disabled :value="productInfo.origin" />
+        </a-form-model-item>
+        <a-form-model-item label="填报时间">
+          <a-input disabled :value="productInfo.infotime" />
+        </a-form-model-item>
+        <a-form-model-item label="存储方式">
+          <a-input disabled :value="productInfo.storage" />
+        </a-form-model-item>
+        <a-form-model-item label="运输方式">
+          <a-input disabled :value="productInfo.transport" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </div>
 </template>
 
 <script>
+import format from '../api/format'
 export default {
   data() {
     let phoneCheckPending
@@ -121,6 +153,8 @@ export default {
       }, 1000)
     }
     return {
+      productInfo: {},
+      viewModalVisible: false,
       loginVisible: false,
       registeredVisible: false,
       labelCol: { span: 4 },
@@ -150,6 +184,20 @@ export default {
     }
   },
   methods: {
+    async onSearch(val) {
+      if (val.trim()) {
+        const res = await this.$http.post('/api/product/selectProductP', {
+          pid: val
+        })
+        if (res.data) {
+          res.data[0].infotime = format(res.data[0].infotime)
+          this.productInfo = res.data[0]
+          this.viewModalVisible = true
+        }
+      } else {
+        this.$message.warning('请输入产品序列号')
+      }
+    },
     // 展示登录的对话框
     login() {
       this.loginVisible = true

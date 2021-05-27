@@ -1,7 +1,10 @@
 <template>
   <div class="homePage">
     <a-layout class="layout">
-      <a-layout-header class="header">农产品溯源数据采集平台</a-layout-header>
+      <a-layout-header class="header"
+        >农产品溯源数据采集平台
+        <a-button style="float:right;margin-top:15px" @click="logOut">退出</a-button>
+      </a-layout-header>
       <a-layout>
         <a-layout-sider class="sider">
           <a-menu theme="dark" :default-selected-keys="['goods']">
@@ -25,7 +28,12 @@
 </template>
 <script>
 export default {
-  methods: {}
+  methods: {
+    logOut() {
+      window.sessionStorage.removeItem('token')
+      this.$router.push('/login')
+    }
+  }
 }
 </script>
 <style>
